@@ -31,8 +31,8 @@ cd ~/docker/pihole-unbound
 - `mkdir -p ~/docker/pihole-unbound`: Creates a working directory in your home folder.
 - `sudo mkdir -p /srv/docker/...`: Creates **bind mounts** for Pi-hole and Unbound.
 - `sudo chown -R $USER:$USER /srv/docker`: Ensures **your user owns the folders**.
-- `chmod -R 755 /srv/docker` → Sets **read/write permissions** for better access.
-- `touch unbound.log` → Prepares the **log file for Unbound**.
+- `chmod -R 755 /srv/docker`: Sets **read/write permissions** for better access.
+- `touch unbound.log`: Prepares the **log file for Unbound**.
 
 ---
 
