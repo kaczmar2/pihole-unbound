@@ -94,21 +94,19 @@ The first command should give a status report of SERVFAIL and no IP address. The
 ---
 
 ## Step 5: Set the Pi-hole Admin Password
-You can set the password via the web UI.
-If you want to include the password in your `.env` file, don't use the plain text password. Use the `pwhash` instead.
 
-```sh
+```
 docker exec -it pihole pihole setpassword '<your_password>'
 ```
-Copy the password hash into `pihole.toml`:
 
-```sh
-cat /srv/docker/pihole-unbound/pihole/etc-pihole/pihole.toml | grep "pwhash"
-nano /srv/docker/pihole-unbound/pihole/etc-pihole/pihole.toml
+Get the hashed password from `pihole.toml` into `.env`:
 ```
-
-and edit the `pwhash` line. Enter your hashed password value: `pwhash = "$BALLOON-SHA256$v=1$s=1024,t=32$i5L7I/FLHYJv0...`
----
+cat /srv/docker/pihole-unbound/pihole/etc-pihole/pihole.toml | grep "pwhash"
+```
+Copy the hashed password into `.env`:
+```
+WEB_PWHASH='$BALLOON-SHA256$v=1$s=1024,t=32$i5L7I/FLH
+```
 
 
 ## Step 6: Access the Pi-hole Web Interface
