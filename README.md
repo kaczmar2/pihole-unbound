@@ -1,13 +1,16 @@
 # Pi-hole v6 + Unbound in Docker
 
-This repository provides a **Docker Compose** setup for running **Pi-hole v6** with **Unbound** as a recursive DNS resolver.
+## 🔹 Summary
+This is a **baseline setup of Pi-hole and Unbound** using Docker. It assumes that you already have a consumer router with a **separate DHCP and NTP server** (such as **Netgear, TP-Link, UniFi, etc.**). If you want Pi-hole to handle DHCP, additional configuration is needed.
+
+This setup follows the official **[Pi-hole Unbound guide](https://docs.pi-hole.net/guides/dns/unbound/)** but adapts it for **Pihole v6 and Docker Compose**.
 
 ---
 
 ## Prerequisites
 Before you begin, ensure you are running:
 - A **Debian or Debian-based Linux distribution** (Ubuntu, Raspberry Pi OS, etc.)
-- **Docker** and **Docker Compose** installed  
+- [**Docker** installed](https://docs.docker.com/engine/install/)
 
 ## Step 1: Create the Directory Structure for Bind Mounts
 Before downloading the repository, set up the necessary directories for your **bind mounts**.
@@ -24,6 +27,12 @@ chmod -R 755 /srv/docker
 touch /srv/docker/pihole-unbound/unbound/etc-unbound/unbound.log
 cd ~/docker/pihole-unbound
 ```
+### **What These Commands Do**
+- `mkdir -p ~/docker/pihole-unbound`: Creates a working directory in your home folder.
+- `sudo mkdir -p /srv/docker/...`: Creates **bind mounts** for Pi-hole and Unbound.
+- `sudo chown -R $USER:$USER /srv/docker`: Ensures **your user owns the folders**.
+- `chmod -R 755 /srv/docker` → Sets **read/write permissions** for better access.
+- `touch unbound.log` → Prepares the **log file for Unbound**.
 
 ---
 
@@ -45,6 +54,11 @@ tar -xzf main.tar.gz --strip-components=1
 
 The `--strip-components=1` flag ensures the contents are extracted directly into `~/docker/pihole-unbound` instead of creating an extra subdirectory.
 
+**Optional: Remove the archive after extraction**
+```sh
+rm main.tar.gz
+```
+
 ---
 
 ## Step 3: Start the Pi-hole + Unbound Containers
@@ -54,50 +68,48 @@ Now, deploy the Pi-hole and Unbound services using:
 docker compose up -d
 ```
 
-To check running containers:
-
-```sh
-docker ps
-```
-
 ---
 
 ## Step 4: Verify Unbound is Working
-To confirm Unbound is resolving queries correctly, run:
+
+To confirm Unbound is resolving queries correctly, run the following commands **on the host**:
+
+Test that Unbound is operational:
 
 ```sh
 dig pi-hole.net @172.31.99.3 -p 5335
+```
+
+The first query may be quite slow, but subsequent queries should be fairly quick.
+
+**Test validation**
+
+```sh
 dig fail01.dnssec.works @172.31.99.3 -p 5335
 dig dnssec.works @172.31.99.3 -p 5335
 ```
 
-If Unbound is working correctly, you should see **valid DNS responses**.
+The first command should give a status report of SERVFAIL and no IP address. The second should give NOERROR plus an IP address.
 
 ---
 
 ## Step 5: Set the Pi-hole Admin Password
-You can set the password via the web UI or by running the following command:
+You can set the password via the web UI.
+If you want to include the password in your `.env` file, don't use the plain text password. Use the `pwhash` instead.
 
 ```sh
-docker exec -it pihole pihole -a -p
+docker exec -it pihole pihole setpassword '<your_password>'
 ```
-
-You will be prompted to enter a new password.
-
-Alternatively, to **generate a password hash** and copy it into `.env`:
+Copy the password hash into `pihole.toml`:
 
 ```sh
-docker exec -it pihole /bin/bash
-pihole -a -p
+cat /srv/docker/pihole-unbound/pihole/etc-pihole/pihole.toml | grep "pwhash"
+nano /srv/docker/pihole-unbound/pihole/etc-pihole/pihole.toml
 ```
 
-If you need to reset the password in the future, you can run:
-
-```sh
-docker exec -it pihole pihole -a -p
-```
-
+and edit the `pwhash` line. Enter your hashed password value: `pwhash = "$BALLOON-SHA256$v=1$s=1024,t=32$i5L7I/FLHYJv0...`
 ---
+
 
 ## Step 6: Access the Pi-hole Web Interface
 Once running, open your web browser and go to:
@@ -112,14 +124,8 @@ Login using the password you set.
 
 ## Step 7: Secure with SSL (Optional)
 For enhanced security, see my other guides on **configuring SSL encryption** for the Pi-hole web interface.
-
+- [Pi-hole v6 + Docker: Automating Let's Encrypt SSL Renewal with Cloudflare DNS](https://gist.github.com/kaczmar2/027fd6f64f4e4e7ebbb0c75cb3409787#file-pihole-v6-docker-le-cf-md)
 ---
 
 ## ❤️ Contributing
-Feel free to **fork** the repository, submit **pull requests**, or open **issues** if you have suggestions or improvements!
-
----
-
-## 📢 Share & Discuss
-If you find this useful, share it with the community on **Reddit, forums, or GitHub discussions!** 🚀
-```
+Feel free to **fork** the repository, submit **pull requests**, or open **issues** if you have suggestions.
