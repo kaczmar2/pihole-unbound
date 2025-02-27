@@ -1,7 +1,7 @@
 # Pi-hole v6 + Unbound in Docker
 
 ## Summary
-This is a **baseline setup of Pi-hole and Unbound** using Docker. It assumes that you already have a consumer router with a **separate DHCP and NTP server** (such as **Netgear, TP-Link, UniFi, etc.**). If you want Pi-hole to handle DHCP, additional configuration is needed.
+This is a **baseline setup of Pi-hole and Unbound** using Docker. It assumes that you already have a gateway/router with a **separate DHCP and NTP server**. If you want Pi-hole to handle DHCP, additional configuration is needed.
 
 This setup follows the official **[Pi-hole Unbound guide](https://docs.pi-hole.net/guides/dns/unbound/)** but adapts it for **Pihole v6 and Docker Compose**.
 
