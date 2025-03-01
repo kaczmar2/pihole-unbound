@@ -1,18 +1,8 @@
 # More info at https://github.com/pi-hole/docker-pi-hole/ and https://docs.pi-hole.net/
-networks:
-  dns_net:
-    driver: bridge
-    ipam:
-        config:
-        - subnet: 172.31.99.0/29
-
 services:
   pihole:
     container_name: pihole
     image: pihole/pihole:latest
-    networks:
-      dns_net:
-        ipv4_address: 172.31.99.2
     ports:
       # DNS Ports
       - "53:53/tcp"
@@ -31,7 +21,7 @@ services:
       #FTLCONF_webserver_api_pwhash: ${WEB_PWHASH}
       # If using Docker's default `bridge` network setting the dns listening mode should be set to 'all'
       FTLCONF_dns_listeningMode: 'all'
-      FTLCONF_dns_upstreams: '172.31.99.3#5335' # Unbound
+      FTLCONF_dns_upstreams: '127.0.0.1#5335' # Unbound
       # Don't use pihole as a NTP Server
       FTLCONF_ntp_ipv4_active: ${NTP_IPV4_ACTIVE:-true}
       FTLCONF_ntp_ipv6_active: ${NTP_IPV6_ACTIVE:-true}
@@ -41,7 +31,7 @@ services:
       # For persisting Pi-hole's databases and common configuration file
       - '/srv/docker/pihole-unbound/pihole/etc-pihole:/etc/pihole'
       # Uncomment the below if you have custom dnsmasq config files that you want to persist. Not needed for most starting fresh with Pi-hole v6. If you're upgrading from v5 you and have used this directory before, you should keep it enabled for the first v6 container start to allow for a complete migration. It can be removed afterwards. Needs environment variable FTLCONF_misc_etc_dnsmasq_d: 'true'
-      - '/srv/docker/pihole-unbound/pihole/etc-dnsmasq.d:/etc/dnsmasq.d'
+      #- '/srv/docker/pihole-unbound/pihole/etc-dnsmasq.d:/etc/dnsmasq.d'
     cap_add:
       # See https://github.com/pi-hole/docker-pi-hole#note-on-capabilities
       # Required if you are using Pi-hole as your DHCP server, else not needed
@@ -51,16 +41,11 @@ services:
       # Optional, if Pi-hole should get some more processing time
       - SYS_NICE
     restart: unless-stopped
-    depends_on:
-      unbound:
-        condition: service_healthy
-
   unbound:
     container_name: unbound
     image: mvance/unbound:latest
-    networks:
-      dns_net:
-        ipv4_address: 172.31.99.3
+    # use pihole network stack
+    network_mode: service:pihole
     volumes:
       # main config
       - ./unbound-config/unbound.conf:/opt/unbound/etc/unbound/unbound.conf:ro
@@ -68,9 +53,6 @@ services:
       - ./unbound-config/unbound.conf.d:/opt/unbound/etc/unbound/unbound.conf.d:ro
       # log file
       - /srv/docker/pihole-unbound/unbound/etc-unbound/unbound.log:/opt/unbound/etc/unbound/unbound.log
-    ports:
-      - "5335:53/tcp"
-      - "5335:53/udp"
     restart: unless-stopped
     post_start:
       # remove unused config files
