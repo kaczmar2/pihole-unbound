@@ -5,6 +5,11 @@ This is a **baseline setup of Pi-hole and Unbound** using Docker. It assumes tha
 
 This setup follows the official **[Pi-hole Unbound guide](https://docs.pi-hole.net/guides/dns/unbound/)** but adapts it for **Pihole v6 and Docker Compose**.
 
+In this setup, **Unbound does not have its own network interface**; instead, it runs using **Pi-hole’s network stack** (`network_mode: service:pihole`). This means:
+- **Unbound is not exposed to the host network** but can still resolve recursive DNS queries.
+- **Pi-hole forwards all upstream DNS queries** to `127.0.0.1#5335`, where Unbound handles recursive lookups.
+- **No additional networking configurations are needed** for Unbound.
+
 ---
 
 ## Prerequisites
@@ -17,7 +22,7 @@ Before downloading the repository, set up the necessary directories for your **b
 
 Run the following commands:
 
-```sh
+```bash
 mkdir -p ~/docker/pihole-unbound
 sudo mkdir -p /srv/docker/pihole-unbound/pihole/etc-pihole
 sudo mkdir -p /srv/docker/pihole-unbound/pihole/etc-dnsmasq.d
@@ -41,13 +46,13 @@ cd ~/docker/pihole-unbound
 You can download the latest version of this repository using **`wget`** or **`curl`**:
 
 **Option 1: Using `wget`**
-```sh
+```bash
 wget https://github.com/kaczmar2/pihole-unbound/archive/refs/heads/main.tar.gz
 tar -xzf main.tar.gz --strip-components=1
 ```
 
 **Option 2: Using `curl`**
-```sh
+```bash
 curl -L -o main.tar.gz https://github.com/kaczmar2/pihole-unbound/archive/refs/heads/main.tar.gz
 tar -xzf main.tar.gz --strip-components=1
 ```
@@ -64,7 +69,7 @@ rm main.tar.gz
 ## Step 3: Start the Pi-hole + Unbound Containers
 Now, deploy the Pi-hole and Unbound services using:
 
-```sh
+```bash
 docker compose up -d
 ```
 
@@ -72,21 +77,26 @@ docker compose up -d
 
 ## Step 4: Verify Unbound is Working
 
-To confirm Unbound is resolving queries correctly, run the following commands **on the host**:
+To confirm Unbound is resolving queries correctly, run the following commands **in the pihole container**:
+
+Open a `bash` shell in the container:
+```bash
+docker exec -it pihole /bin/bash
+```
 
 Test that Unbound is operational:
 
-```sh
-dig pi-hole.net @172.31.99.3 -p 5335
+```bash
+dig pi-hole.net @127.0.0.1 -p 5335
 ```
 
 The first query may be quite slow, but subsequent queries should be fairly quick.
 
 **Test validation**
 
-```sh
-dig fail01.dnssec.works @172.31.99.3 -p 5335
-dig dnssec.works @172.31.99.3 -p 5335
+```bash
+dig fail01.dnssec.works @127.0.0.1 -p 5335
+dig dnssec.works @127.0.0.1 -p 5335
 ```
 
 The first command should give a status report of SERVFAIL and no IP address. The second should give NOERROR plus an IP address.
@@ -95,27 +105,31 @@ The first command should give a status report of SERVFAIL and no IP address. The
 
 ## Step 5: Set the Pi-hole Admin Password
 
-```
-docker exec -it pihole pihole setpassword 'mypassword'
+To set the pihole web admin password, run the following commands **in the pihole container**, if you're not already there from the previous step (`docker exec -it pihole /bin/bash`):
+
+```bash
+pihole setpassword 'mypassword'
 ```
 
 Get the hashed password from `pihole.toml`:
-```
-cat /srv/docker/pihole-unbound/pihole/etc-pihole/pihole.toml | grep "pwhash"
+```bash
+cat /etc/pihole/pihole.toml | grep -w pwhash
 ```
 
-Copy the hashed password into `.env`:
-```
+`exit` the container and copy the hashed password into your `.env` file on the host.
+
+Make sure to enclose the value in single quotes (`''`).
+```bash
 WEB_PWHASH='$BALLOON-SHA256$v=1$s=1024,t=32$pZCbBIUH/Ew2n144eLn3vw==$vgej+obQip4DvSmNlywD0LUHlsHcqgLdbQLvDscZs78='
 ```
 
-Uncomment the `FTLCONF_webserver_api_pwhash` enviornment variable in docker-compose.yml:
-```
+Uncomment the `FTLCONF_webserver_api_pwhash` enviornment variable in `docker-compose.yml`:
+```bash
 FTLCONF_webserver_api_pwhash: ${WEB_PWHASH}
 ```
 
 Restart the containers:
-```
+```bash
 docker compose down
 docker compose up -d
 ```
@@ -131,10 +145,47 @@ Login using the password you set.
 
 ---
 
-## Step 7: Secure with SSL (Optional)
+## Step 7: Fix `so-rcvbuf` warning in Unbound (Optional)
+
+The configuration in `pi-hole.conf` sets the **socket receive buffer size** for incoming DNS queries to a higher-than-default value in order to handle high query rates. You may see a warning in unbound related to this setting:
+```bash
+so-rcvbuf 1048576 was not granted. Got 425984. To fix: start with root permissions(linux) or sysctl bigger net.core.rmem_max(linux) or kern.ipc.maxsockbuf(bsd) values.
+```
+
+To fix it:
+
+1. Check the current limit. This will show something like `net.core.rmem_max = 425984`:
+```bash
+sudo sysctl net.core.rmem_max
+```
+
+2. Temporarily increase the limit to match Unbound's request:
+```bash
+sudo sysctl -w net.core.rmem_max=1048576
+```
+
+3. Make it permanent. Edit `/etc/sysctl.conf` and add or edit the line:
+```bash
+net.core.rmem_max=1048576
+```
+
+4. Save and apply:
+```bash
+sudo sysctl -p
+```
+
+## Step 8: Secure with SSL (Optional)
 For enhanced security, see my other guides on **configuring SSL encryption** for the Pi-hole web interface.
 - [Pi-hole v6 + Docker: Automating Let's Encrypt SSL Renewal with Cloudflare DNS](https://gist.github.com/kaczmar2/027fd6f64f4e4e7ebbb0c75cb3409787#file-pihole-v6-docker-le-cf-md)
 ---
+
+## Check Docker logs
+This will **show live logs** for both the `pihole` and `unbound` containers.
+```bash
+docker logs -f pihole
+docker logs -f unbound
+```
+
 
 ## Unbound Custom Configuration
 
