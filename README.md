@@ -17,6 +17,28 @@ Before you begin, ensure you are running:
 - A **Debian or Debian-based Linux distribution** (Ubuntu, Raspberry Pi OS, etc.)
 - [**Docker** installed](https://docs.docker.com/engine/install/)
 
+---
+
+## Quick Start
+
+```bash
+# Create directories
+mkdir -p ~/docker/pihole-unbound
+sudo mkdir -p /srv/docker/pihole-unbound/{pihole/{etc-pihole,etc-dnsmasq.d},unbound/etc-unbound}
+sudo chown -R $USER:$USER /srv/docker && chmod -R 755 /srv/docker
+touch /srv/docker/pihole-unbound/unbound/etc-unbound/unbound.log
+cd ~/docker/pihole-unbound
+
+# Download and start
+wget https://github.com/kaczmar2/pihole-unbound/archive/refs/heads/main.tar.gz
+tar -xzf main.tar.gz --strip-components=1 && rm main.tar.gz
+docker compose up -d
+```
+
+For detailed setup instructions, continue reading below.
+
+---
+
 ## Step 1: Create the Directory Structure for Bind Mounts
 Before downloading the repository, set up the necessary directories for your **bind mounts**.
 
@@ -58,6 +80,8 @@ tar -xzf main.tar.gz --strip-components=1
 ```
 
 The `--strip-components=1` flag ensures the contents are extracted directly into `~/docker/pihole-unbound` instead of creating an extra subdirectory.
+
+**Note for Raspberry Pi users**: If you're running this on a Raspberry Pi, you'll need to modify the Unbound image in `docker-compose.yml` from `mvance/unbound` to `mvance/unbound-rpi`.
 
 **Optional: Remove the archive after extraction**
 ```sh
@@ -123,7 +147,7 @@ Make sure to enclose the value in single quotes (`''`).
 WEB_PWHASH='$BALLOON-SHA256$v=1$s=1024,t=32$pZCbBIUH/Ew2n144eLn3vw==$vgej+obQip4DvSmNlywD0LUHlsHcqgLdbQLvDscZs78='
 ```
 
-Uncomment the `FTLCONF_webserver_api_pwhash` enviornment variable in `docker-compose.yml`:
+Uncomment the `FTLCONF_webserver_api_pwhash` environment variable in `docker-compose.yml`:
 ```bash
 FTLCONF_webserver_api_pwhash: ${WEB_PWHASH}
 ```
@@ -145,9 +169,13 @@ Login using the password you set.
 
 ---
 
-## Step 7: Fix `so-rcvbuf` warning in Unbound (Optional)
+## Common Issues & Troubleshooting
 
-The configuration in `pi-hole.conf` sets the **socket receive buffer size** for incoming DNS queries to a higher-than-default value in order to handle high query rates. You may see a warning in unbound related to this setting:
+### Fix `so-rcvbuf` warning in Unbound (Optional)
+
+The configuration in `pi-hole.conf` sets the **socket receive buffer size** for incoming DNS queries to a higher-than-default value in order to handle high query rates. 
+
+You may see this warning in unbound logs:
 ```bash
 so-rcvbuf 1048576 was not granted. Got 425984. To fix: start with root permissions(linux) or sysctl bigger net.core.rmem_max(linux) or kern.ipc.maxsockbuf(bsd) values.
 ```
@@ -185,7 +213,6 @@ This will **show live logs** for both the `pihole` and `unbound` containers.
 docker logs -f pihole
 docker logs -f unbound
 ```
-
 
 ## Unbound Custom Configuration
 

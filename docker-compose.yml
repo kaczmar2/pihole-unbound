@@ -2,7 +2,7 @@
 services:
   pihole:
     container_name: pihole
-    image: pihole/pihole:latest
+    image: pihole/pihole
     ports:
       # DNS Ports
       - "53:53/tcp"
@@ -25,7 +25,7 @@ services:
       # Don't use pihole as a NTP Server
       FTLCONF_ntp_ipv4_active: ${NTP_IPV4_ACTIVE:-true}
       FTLCONF_ntp_ipv6_active: ${NTP_IPV6_ACTIVE:-true}
-      FTLCONF_ntp_sync_active: ${NTP_IPV6_ACTIVE:-true}
+      FTLCONF_ntp_sync_active: ${NTP_SYNC_ACTIVE:-true}
     # Volumes store your data between container upgrades
     volumes:
       # For persisting Pi-hole's databases and common configuration file
@@ -43,7 +43,8 @@ services:
     restart: unless-stopped
   unbound:
     container_name: unbound
-    image: mvance/unbound:latest # Change to use 'mvance/unbound-rpi:latest' on raspberry pi
+    # use 'mvance/unbound-rpi' on raspberry pi
+    image: mvance/unbound
     # use pihole network stack
     network_mode: service:pihole
     volumes:
