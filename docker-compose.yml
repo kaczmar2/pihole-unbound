@@ -43,20 +43,14 @@ services:
     restart: unless-stopped
   unbound:
     container_name: unbound
-    # use 'mvance/unbound-rpi' on raspberry pi
-    image: mvance/unbound
+    image: alpinelinux/unbound
     # use pihole network stack
     network_mode: service:pihole
     volumes:
-      # main config
-      - ./unbound-config/unbound.conf:/opt/unbound/etc/unbound/unbound.conf:ro
-      # custom config (unbound.conf.d/your-config.conf). unbound.conf includes these via wilcard include
-      - ./unbound-config/unbound.conf.d:/opt/unbound/etc/unbound/unbound.conf.d:ro
+      # config files
+      - ./unbound-config/unbound.conf:/etc/unbound/unbound.conf
+      - ./unbound-config/unbound.conf.d:/etc/unbound/unbound.conf.d
       # log file
-      - /srv/docker/pihole-unbound/unbound/etc-unbound/unbound.log:/opt/unbound/etc/unbound/unbound.log
+      - /srv/docker/pihole-unbound/unbound/etc-unbound/unbound.log:/etc/unbound/unbound.log
     restart: unless-stopped
-    post_start:
-      # remove unused config files
-      - command: rm -f /opt/unbound/etc/unbound/a-records.conf
-      - command: rm -f /opt/unbound/etc/unbound/forward-records.conf
-      - command: rm -f /opt/unbound/etc/unbound/srv-records.conf
+

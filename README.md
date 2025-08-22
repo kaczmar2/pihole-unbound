@@ -19,26 +19,6 @@ Before you begin, ensure you are running:
 
 ---
 
-## Quick Start
-
-```bash
-# Create directories
-mkdir -p ~/docker/pihole-unbound
-sudo mkdir -p /srv/docker/pihole-unbound/{pihole/{etc-pihole,etc-dnsmasq.d},unbound/etc-unbound}
-sudo chown -R $USER:$USER /srv/docker && chmod -R 755 /srv/docker
-touch /srv/docker/pihole-unbound/unbound/etc-unbound/unbound.log
-cd ~/docker/pihole-unbound
-
-# Download and start
-wget https://github.com/kaczmar2/pihole-unbound/archive/refs/heads/main.tar.gz
-tar -xzf main.tar.gz --strip-components=1 && rm main.tar.gz
-docker compose up -d
-```
-
-For detailed setup instructions, continue reading below.
-
----
-
 ## Step 1: Create the Directory Structure for Bind Mounts
 Before downloading the repository, set up the necessary directories for your **bind mounts**.
 
@@ -81,7 +61,7 @@ tar -xzf main.tar.gz --strip-components=1
 
 The `--strip-components=1` flag ensures the contents are extracted directly into `~/docker/pihole-unbound` instead of creating an extra subdirectory.
 
-**Note for Raspberry Pi users**: If you're running this on a Raspberry Pi, you'll need to modify the Unbound image in `docker-compose.yml` from `mvance/unbound` to `mvance/unbound-rpi`.
+**Note**: This setup now uses the official `alpinelinux/unbound` Docker image, which provides better security, regular updates, and cross-platform compatibility (including Raspberry Pi).
 
 **Optional: Remove the archive after extraction**
 ```sh
@@ -154,8 +134,7 @@ FTLCONF_webserver_api_pwhash: ${WEB_PWHASH}
 
 Restart the containers:
 ```bash
-docker compose down
-docker compose up -d
+docker compose down && docker compose up -d
 ```
 
 ## Step 6: Access the Pi-hole Web Interface
@@ -180,7 +159,7 @@ You may see this warning in unbound logs:
 so-rcvbuf 1048576 was not granted. Got 425984. To fix: start with root permissions(linux) or sysctl bigger net.core.rmem_max(linux) or kern.ipc.maxsockbuf(bsd) values.
 ```
 
-To fix it:
+To fix it, **run these commands on the host system**:
 
 1. Check the current limit. This will show something like `net.core.rmem_max = 425984`:
 ```bash
@@ -208,10 +187,10 @@ For enhanced security, see my other guides on **configuring SSL encryption** for
 ---
 
 ## Check Docker logs
-This will **show live logs** for both the `pihole` and `unbound` containers.
+This will show logs for both the `pihole` and `unbound` containers.
 ```bash
-docker logs -f pihole
-docker logs -f unbound
+docker logs pihole
+docker logs unbound
 ```
 
 ## Unbound Custom Configuration
