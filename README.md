@@ -207,7 +207,3 @@ The `unbound.conf.d/` directory contains custom configuration settings for Unbou
 ### Notes:
 - All files in `unbound.conf.d/` are automatically read by Unbound via a **wildcard include** directive in `unbound.conf`.
 - Modify `20-private-domains.conf` as needed to allow other trusted services that require resolving private IPs.
-- The following files have been **removed from the configuration** as they are not required for the Pi-hole + Unbound setup:
-  - `forward-records.conf`: This setup uses Unbound as a recursive resolver so forwarding is unnecessary.
-  - `a-records.conf`: Pi-hole can handle local hostname resolution instead.
-  - `srv-records.conf`: Most home networks don’t need this, unless you are doing things running Active Directory or doing service discovery.
