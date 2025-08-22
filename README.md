@@ -83,9 +83,9 @@ docker compose up -d
 
 To confirm Unbound is resolving queries correctly, run the following commands **in the pihole container**:
 
-Open a shell in the container:
+Open a `bash` shell in the container:
 ```bash
-docker exec -it pihole /bin/sh
+docker exec -it pihole /bin/bash
 ```
 
 Test that Unbound is operational:
@@ -134,8 +134,7 @@ FTLCONF_webserver_api_pwhash: ${WEB_PWHASH}
 
 Restart the containers:
 ```bash
-docker compose down
-docker compose up -d
+docker compose down && docker compose up -d
 ```
 
 ## Step 6: Access the Pi-hole Web Interface
@@ -188,10 +187,10 @@ For enhanced security, see my other guides on **configuring SSL encryption** for
 ---
 
 ## Check Docker logs
-This will **show live logs** for both the `pihole` and `unbound` containers.
+This will show logs for both the `pihole` and `unbound` containers.
 ```bash
-docker logs -f pihole
-docker logs -f unbound
+docker logs pihole
+docker logs unbound
 ```
 
 ## Unbound Custom Configuration
