@@ -52,8 +52,5 @@ services:
       - ./unbound-config/unbound.conf.d:/etc/unbound/unbound.conf.d
       # log file
       - /srv/docker/pihole-unbound/unbound/etc-unbound/unbound.log:/etc/unbound/unbound.log
-    sysctls:
-      - net.core.rmem_max=1048576
-      - net.core.wmem_max=1048576
     restart: unless-stopped
 
