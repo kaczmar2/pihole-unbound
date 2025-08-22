@@ -19,26 +19,6 @@ Before you begin, ensure you are running:
 
 ---
 
-## Quick Start
-
-```bash
-# Create directories
-mkdir -p ~/docker/pihole-unbound
-sudo mkdir -p /srv/docker/pihole-unbound/{pihole/{etc-pihole,etc-dnsmasq.d},unbound/etc-unbound}
-sudo chown -R $USER:$USER /srv/docker && chmod -R 755 /srv/docker
-touch /srv/docker/pihole-unbound/unbound/etc-unbound/unbound.log
-cd ~/docker/pihole-unbound
-
-# Download and start
-wget https://github.com/kaczmar2/pihole-unbound/archive/refs/heads/main.tar.gz
-tar -xzf main.tar.gz --strip-components=1 && rm main.tar.gz
-docker compose up -d
-```
-
-For detailed setup instructions, continue reading below.
-
----
-
 ## Step 1: Create the Directory Structure for Bind Mounts
 Before downloading the repository, set up the necessary directories for your **bind mounts**.
 
