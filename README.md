@@ -81,7 +81,7 @@ tar -xzf main.tar.gz --strip-components=1
 
 The `--strip-components=1` flag ensures the contents are extracted directly into `~/docker/pihole-unbound` instead of creating an extra subdirectory.
 
-**Note for Raspberry Pi users**: If you're running this on a Raspberry Pi, you'll need to modify the Unbound image in `docker-compose.yml` from `mvance/unbound` to `mvance/unbound-rpi`.
+**Note**: This setup now uses the official `alpinelinux/unbound` Docker image, which provides better security, regular updates, and cross-platform compatibility (including Raspberry Pi).
 
 **Optional: Remove the archive after extraction**
 ```sh
@@ -103,9 +103,9 @@ docker compose up -d
 
 To confirm Unbound is resolving queries correctly, run the following commands **in the pihole container**:
 
-Open a `bash` shell in the container:
+Open a shell in the container:
 ```bash
-docker exec -it pihole /bin/bash
+docker exec -it pihole /bin/sh
 ```
 
 Test that Unbound is operational:
@@ -180,7 +180,7 @@ You may see this warning in unbound logs:
 so-rcvbuf 1048576 was not granted. Got 425984. To fix: start with root permissions(linux) or sysctl bigger net.core.rmem_max(linux) or kern.ipc.maxsockbuf(bsd) values.
 ```
 
-To fix it:
+To fix it, **run these commands on the host system**:
 
 1. Check the current limit. This will show something like `net.core.rmem_max = 425984`:
 ```bash
