@@ -24,6 +24,7 @@ services:
       FTLCONF_dns_upstreams: '127.0.0.1#5335' # Unbound
       # Don't use pihole as a NTP/DHCP Server
       FTLCONF_dhcp_active: ${DHCP_ACTIVE}
+      FTLCONF_dhcp_ipv6: ${DHCP_IPV6_ACTIVE}
       FTLCONF_ntp_ipv4_active: ${NTP_IPV4_ACTIVE}
       FTLCONF_ntp_ipv6_active: ${NTP_IPV6_ACTIVE}
       FTLCONF_ntp_sync_active: ${NTP_SYNC_ACTIVE}
