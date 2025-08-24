@@ -20,12 +20,13 @@ services:
       # Set a password to access the web interface. Not setting one will result in a random password being assigned
       #FTLCONF_webserver_api_pwhash: ${WEB_PWHASH}
       # If using Docker's default `bridge` network setting the dns listening mode should be set to 'all'
-      FTLCONF_dns_listeningMode: 'all'
+      FTLCONF_dns_listeningMode: ${DNS_LISTENINGMODE}
       FTLCONF_dns_upstreams: '127.0.0.1#5335' # Unbound
-      # Don't use pihole as a NTP Server
-      FTLCONF_ntp_ipv4_active: ${NTP_IPV4_ACTIVE:-true}
-      FTLCONF_ntp_ipv6_active: ${NTP_IPV6_ACTIVE:-true}
-      FTLCONF_ntp_sync_active: ${NTP_SYNC_ACTIVE:-true}
+      # Don't use pihole as a NTP/DHCP Server
+      FTLCONF_dhcp_active: ${DHCP_ACTIVE}
+      FTLCONF_ntp_ipv4_active: ${NTP_IPV4_ACTIVE}
+      FTLCONF_ntp_ipv6_active: ${NTP_IPV6_ACTIVE}
+      FTLCONF_ntp_sync_active: ${NTP_SYNC_ACTIVE}
     # Volumes store your data between container upgrades
     volumes:
       # For persisting Pi-hole's databases and common configuration file
