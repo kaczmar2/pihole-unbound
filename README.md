@@ -80,44 +80,7 @@ Optional: Remove the archive after extraction:
 rm main.tar.gz
 ```
 
-## Step 3: Start the Pi-hole + Unbound Containers
-
-Now, deploy the Pi-hole and Unbound services using:
-
-```bash
-docker compose up -d
-```
-
-## Step 4: Verify Unbound is Working
-
-To confirm Unbound is resolving queries correctly, run the following commands
-**in the pihole container**:
-
-Open a `bash` shell in the container:
-
-```bash
-docker exec -it pihole /bin/bash
-```
-
-Test that Unbound is operational:
-
-```bash
-dig pi-hole.net @127.0.0.1 -p 5335
-```
-
-The first query may be quite slow, but subsequent queries should be fairly quick.
-
-Test validation:
-
-```bash
-dig fail01.dnssec.works @127.0.0.1 -p 5335
-dig dnssec.works @127.0.0.1 -p 5335
-```
-
-The first command should give a status report of SERVFAIL and no IP address. The
-second should give NOERROR plus an IP address.
-
-## Step 5: Set the Pi-hole Admin Password
+## Step 3: Set the Pi-hole Admin Password
 
 ### Automated Setup
 
@@ -196,7 +159,36 @@ the TOML file to be updated.
 
 </details>
 
-## Step 6: Access the Pi-hole Web Interface
+## Step 4: Verify Unbound is Working
+
+To confirm Unbound is resolving queries correctly, run the following commands
+**in the pihole container**:
+
+Open a `bash` shell in the container:
+
+```bash
+docker exec -it pihole /bin/bash
+```
+
+Test that Unbound is operational:
+
+```bash
+dig pi-hole.net @127.0.0.1 -p 5335
+```
+
+The first query may be quite slow, but subsequent queries should be fairly quick.
+
+Test validation:
+
+```bash
+dig fail01.dnssec.works @127.0.0.1 -p 5335
+dig dnssec.works @127.0.0.1 -p 5335
+```
+
+The first command should give a status report of SERVFAIL and no IP address. The
+second should give NOERROR plus an IP address.
+
+## Step 5: Access the Pi-hole Web Interface
 
 Once running, open your web browser and go to:
 
@@ -206,7 +198,7 @@ http://<your-server-ip>/admin/
 
 Login using the password you set.
 
-## Step 7: Secure with SSL (Optional)
+## Step 6: Secure with SSL (Optional)
 
 For enhanced security, see my other guides on **configuring SSL encryption** for
 the Pi-hole web interface.
