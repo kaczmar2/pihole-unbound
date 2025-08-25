@@ -119,39 +119,82 @@ second should give NOERROR plus an IP address.
 
 ## Step 5: Set the Pi-hole Admin Password
 
-To set the pihole web admin password, run the following commands
-**in the pihole container**, if you're not already there from the previous step
-(`docker exec -it pihole /bin/bash`):
+### Automated Setup
+
+Use the automated setup script to configure your Pi-hole admin password:
 
 ```bash
-pihole setpassword 'mypassword'
+./setup-password.sh
 ```
 
-Get the hashed password from `pihole.toml`:
+This script will:
 
-```bash
-cat /etc/pihole/pihole.toml | grep -w pwhash
-```
+- Prompt you securely for a password
+- Temporarily disable the password environment variable in docker-compose.yml
+- Set the password in the Pi-hole container (writes to pihole.toml)
+- Extract and save the password hash to your `.env` file
+- Re-enable the password environment variable in docker-compose.yml
+- Restart containers with the new configuration
+- Create backups of your config files
 
-`exit` the container and copy the hashed password into your `.env` file on the host.
+Your Pi-hole admin interface will be ready with the password you set.
 
-Make sure to enclose the value in single quotes (`''`).
+### Manual Setup
 
-```bash
-WEB_PWHASH='$BALLOON-SHA256$v=1$s=1024,t=32$pZCbBIUH/Ew2n144eLn3vw==$vgej+obQip4DvSmNlywD0LUHlsHcqgLdbQLvDscZs78='
-```
+If you prefer the manual approach or need to troubleshoot:
 
-Uncomment the `FTLCONF_webserver_api_pwhash` environment variable in `docker-compose.yml`:
+<details>
+<summary>Click to expand manual setup instructions</summary>
 
-```bash
-FTLCONF_webserver_api_pwhash: ${WEB_PWHASH}
-```
+**Important**: For Pi-hole v6, environment variables override the TOML file.
+You must temporarily comment out the password environment variable to allow
+the TOML file to be updated.
 
-Restart the containers:
+1. Comment out `FTLCONF_webserver_api_pwhash` in `docker-compose.yml`:
 
-```bash
-docker compose down && docker compose up -d
-```
+   ```yaml
+   # FTLCONF_webserver_api_pwhash: ${WEBSERVER_PWHASH}
+   ```
+
+2. Restart containers to apply the change:
+
+   ```bash
+   docker compose down && docker compose up -d
+   ```
+
+3. Set your password in the Pi-hole container:
+
+   ```bash
+   docker exec -it pihole /bin/bash
+   pihole setpassword 'mypassword'
+   ```
+
+4. Get the hashed password from `pihole.toml`:
+
+   ```bash
+   cat /etc/pihole/pihole.toml | grep -E "^[[:space:]]*pwhash[[:space:]]*="
+   exit
+   ```
+
+5. Copy the hash value and add it to your `.env` file (enclose in single quotes):
+
+   ```bash
+   WEBSERVER_PWHASH='$BALLOON-SHA256$v=1$s=1024,t=32$pZCbBIUH/Ew2n144eLn3vw==$vgej+obQip4DvSmNlywD0LUHlsHcqgLdbQLvDscZs78='
+   ```
+
+6. Uncomment the `FTLCONF_webserver_api_pwhash` environment variable in `docker-compose.yml`:
+
+   ```yaml
+   FTLCONF_webserver_api_pwhash: ${WEBSERVER_PWHASH}
+   ```
+
+7. Restart the containers:
+
+   ```bash
+   docker compose down && docker compose up -d
+   ```
+
+</details>
 
 ## Step 6: Access the Pi-hole Web Interface
 
