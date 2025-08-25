@@ -193,13 +193,19 @@ fi
 
 # Step 6: Uncomment the password environment variable in docker-compose.yml
 echo -e "${YELLOW}Step 6: Re-enabling password env variable in docker-compose.yml...${NC}"
-if [ "$PASSWORD_LINE_WAS_UNCOMMENTED" = true ]; then
-    # Uncomment the line we commented earlier
+if grep -q "#.*FTLCONF_webserver_api_pwhash" docker-compose.yml; then
+    # Line is commented - uncomment it
     sed -i.tmp 's/^[[:space:]]*#[[:space:]]*FTLCONF_webserver_api_pwhash/      FTLCONF_webserver_api_pwhash/' docker-compose.yml && rm docker-compose.yml.tmp
-    echo -e "${GREEN}Re-enabled FTLCONF_webserver_api_pwhash in docker-compose.yml${NC}"
+    echo -e "${GREEN}Uncommented FTLCONF_webserver_api_pwhash in docker-compose.yml${NC}"
+elif grep -q "^[[:space:]]*FTLCONF_webserver_api_pwhash" docker-compose.yml; then
+    # Line is already uncommented
+    echo -e "${GREEN}FTLCONF_webserver_api_pwhash already uncommented${NC}"
 else
-    echo -e "${YELLOW}Password environment variable was already commented - leaving as-is${NC}"
-    echo -e "${YELLOW}Note: You may need to uncomment FTLCONF_webserver_api_pwhash in docker-compose.yml${NC}"
+    # Line doesn't exist (this shouldn't happen since we checked in Step 1)
+    echo -e "${RED}Warning: FTLCONF_webserver_api_pwhash line not found${NC}"
+    echo -e "${YELLOW}The .env file has been updated, but you'll need to manually add:${NC}"
+    echo -e "${BLUE}      FTLCONF_webserver_api_pwhash: \${WEBSERVER_PWHASH}${NC}"
+    echo -e "${BLUE}to your docker-compose.yml pihole environment section${NC}"
 fi
 
 echo ""
