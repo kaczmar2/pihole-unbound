@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.1.0] - 2025-08-26
+
+### Added
+
+- Automated setup script `set-password.sh` to configure your Pi-hole admin password.
+
+### Changed
+
+- `WEBSERVER_PWHASH` variable naming in `.env` for consistency.
+
 ## [2.0.0] - 2025-08-21
 
 ### Added
@@ -26,6 +36,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Initial Pi-hole + Unbound configuration using mvance/unbound
 - Documentation for setup and configuration
 
-[unreleased]: https://github.com/kaczmar2/pihole-unbound/compare/v2.0.0...HEAD
+[unreleased]: https://github.com/kaczmar2/pihole-unbound/compare/v2.1.0...HEAD
+[2.1.0]: https://github.com/kaczmar2/pihole-unbound/compare/v2.0.0...v2.1.0
 [2.0.0]: https://github.com/kaczmar2/pihole-unbound/compare/v1.0.0...v2.0.0
 [1.0.0]: https://github.com/kaczmar2/pihole-unbound/releases/tag/v1.0.0
