@@ -18,7 +18,7 @@ services:
       # https://en.wikipedia.org/wiki/List_of_tz_database_time_zones, e.g:
       TZ: ${TZ}
       # Set a password to access the web interface. Not setting one will result in a random password being assigned
-      #FTLCONF_webserver_api_pwhash: ${WEB_PWHASH}
+      #FTLCONF_webserver_api_pwhash: ${WEBSERVER_PWHASH}
       # If using Docker's default `bridge` network setting the dns listening mode should be set to 'all'
       FTLCONF_dns_listeningMode: ${DNS_LISTENINGMODE}
       FTLCONF_dns_upstreams: '127.0.0.1#5335' # Unbound
