@@ -76,7 +76,7 @@ compatibility (including Raspberry Pi).
 Use the automated setup script to configure your Pi-hole admin password:
 
 ```bash
-./setup-password.sh
+./set-password.sh
 ```
 
 This script will:
