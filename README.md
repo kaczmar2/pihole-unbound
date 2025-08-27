@@ -17,7 +17,7 @@ runs using **Pi-hole’s network stack** (`network_mode: service:pihole`). This 
 - **No additional networking configurations are needed** for Unbound.
 
 This setup uses the official `alpinelinux/unbound` Docker image, which provides
-better security, regular updates, and cross-platform compatibility (including 
+better security, regular updates, and cross-platform compatibility (including
 Raspberry Pi).
 
 ## Prerequisites
@@ -131,13 +131,13 @@ the TOML file to be updated.
 5. Copy the hash value and add it to your `.env` file (enclose in single quotes):
 
    ```bash
-   WEB_PWHASH='$BALLOON-SHA256$v=1$s=1024,t=32$pZCbBIUH/Ew2n144eLn3vw==$vgej+obQip4DvSmNlywD0LUHlsHcqgLdbQLvDscZs78='
+   WEBSERVER_PWHASH='$BALLOON-SHA256$v=1$s=1024,t=32$pZCbBIUH/Ew2n144eLn3vw==$vgej+obQip4DvSmNlywD0LUHlsHcqgLdbQLvDscZs78='
    ```
 
 6. Uncomment the `FTLCONF_webserver_api_pwhash` environment variable in `docker-compose.yml`:
 
    ```yaml
-   FTLCONF_webserver_api_pwhash: ${WEB_PWHASH}
+   FTLCONF_webserver_api_pwhash: ${WEBSERVER_PWHASH}
    ```
 
 7. Restart the containers:
