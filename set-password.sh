@@ -8,8 +8,8 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-echo -e "${GREEN}Pi-hole v6 + Unbound Password Setup Script${NC}"
-echo -e "${BLUE}=========================================${NC}"
+echo -e "${GREEN}Pi-hole v6 Password Setup Script${NC}"
+echo -e "${BLUE}=================================${NC}"
 echo ""
 
 # Function to show usage
@@ -35,14 +35,14 @@ fi
 # Check if .env file exists
 if [ ! -f .env ]; then
     echo -e "${RED}Error: .env file not found in current directory.${NC}"
-    echo -e "${YELLOW}Please make sure you're running this script from your pihole-unbound directory.${NC}"
+    echo -e "${YELLOW}Please make sure you're running this script from your project root directory.${NC}"
     exit 1
 fi
 
 # Check if docker-compose.yml exists
 if [ ! -f docker-compose.yml ]; then
     echo -e "${RED}Error: docker-compose.yml not found in current directory.${NC}"
-    echo -e "${YELLOW}Please make sure you're running this script from your pihole-unbound directory.${NC}"
+    echo -e "${YELLOW}Please make sure you're running this script from your project root directory.${NC}"
     exit 1
 fi
 
