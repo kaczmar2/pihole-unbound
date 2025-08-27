@@ -53,17 +53,6 @@ if ! docker info > /dev/null 2>&1; then
     exit 1
 fi
 
-# Check if password is already configured
-if grep -q "WEBSERVER_PWHASH=" .env; then
-    echo -e "${YELLOW}Warning: Password appears to already be configured.${NC}"
-    echo -n "Do you want to reset it? (y/N): "
-    read -r reset_password
-    if [[ ! "$reset_password" =~ ^[Yy]$ ]]; then
-        echo "Exiting without changes."
-        exit 0
-    fi
-fi
-
 # Prompt for password if not provided
 if [ -z "$1" ]; then
     echo -e "${BLUE}Enter your desired Pi-hole admin password:${NC}"
@@ -112,7 +101,7 @@ else
     # Line doesn't exist at all
     echo -e "${RED}Error: FTLCONF_webserver_api_pwhash not found in docker-compose.yml${NC}"
     echo -e "${YELLOW}Please make sure your docker-compose.yml includes this line in the pihole environment section:${NC}"
-    echo -e "${BLUE}      FTLCONF_webserver_api_pwhash: \${WEBSERVER_PWHASH}${NC}"
+    echo -e "${BLUE}      FTLCONF_webserver_api_pwhash: \${WEB_PWHASH}${NC}"
     echo ""
     echo -e "${YELLOW}You can add it and run this script again, or set it up manually.${NC}"
     rm docker-compose.yml.backup
@@ -179,16 +168,16 @@ echo -e "${YELLOW}Step 5: Updating .env file with password hash...${NC}"
 cp .env .env.backup
 echo -e "${YELLOW}Created backup: .env.backup${NC}"
 
-if grep -q "WEBSERVER_PWHASH=" .env; then
+if grep -q "WEB_PWHASH=" .env; then
     # Replace existing line (handle both commented and uncommented versions)
-    sed -i.tmp "s|^[[:space:]]*#*[[:space:]]*WEBSERVER_PWHASH=.*|WEBSERVER_PWHASH='$hash_value'|" .env && rm .env.tmp
-    echo -e "${GREEN}Updated existing WEBSERVER_PWHASH in .env${NC}"
+    sed -i.tmp "s|^[[:space:]]*#*[[:space:]]*WEB_PWHASH=.*|WEB_PWHASH='$hash_value'|" .env && rm .env.tmp
+    echo -e "${GREEN}Updated existing WEB_PWHASH in .env${NC}"
 else
     # Add new line
     echo "" >> .env
     echo "# Pi-hole admin password hash (auto-generated)" >> .env
-    echo "WEBSERVER_PWHASH='$hash_value'" >> .env
-    echo -e "${GREEN}Added WEBSERVER_PWHASH to .env${NC}"
+    echo "WEB_PWHASH='$hash_value'" >> .env
+    echo -e "${GREEN}Added WEB_PWHASH to .env${NC}"
 fi
 
 # Step 6: Uncomment the password environment variable in docker-compose.yml
@@ -204,7 +193,7 @@ else
     # Line doesn't exist (this shouldn't happen since we checked in Step 1)
     echo -e "${RED}Warning: FTLCONF_webserver_api_pwhash line not found${NC}"
     echo -e "${YELLOW}The .env file has been updated, but you'll need to manually add:${NC}"
-    echo -e "${BLUE}      FTLCONF_webserver_api_pwhash: \${WEBSERVER_PWHASH}${NC}"
+    echo -e "${BLUE}      FTLCONF_webserver_api_pwhash: \${WEB_PWHASH}${NC}"
     echo -e "${BLUE}to your docker-compose.yml pihole environment section${NC}"
 fi
 

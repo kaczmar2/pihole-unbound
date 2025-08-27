@@ -16,6 +16,10 @@ runs using **Pi-hole’s network stack** (`network_mode: service:pihole`). This 
 - **Pi-hole forwards all upstream DNS queries** to `127.0.0.1#5335`, where Unbound handles recursive lookups.
 - **No additional networking configurations are needed** for Unbound.
 
+This setup uses the official `alpinelinux/unbound` Docker image, which provides
+better security, regular updates, and cross-platform compatibility (including 
+Raspberry Pi).
+
 ## Prerequisites
 
 Before you begin, ensure you are running:
@@ -41,7 +45,7 @@ touch /srv/docker/pihole-unbound/unbound/etc-unbound/unbound.log
 cd ~/docker/pihole-unbound
 ```
 
-### **What These Commands Do**
+### What These Commands Do
 
 - `mkdir -p ~/docker/pihole-unbound`: Creates a working directory in your home folder.
 - `sudo mkdir -p /srv/docker/...`: Creates **bind mounts** for Pi-hole and Unbound.
@@ -51,16 +55,7 @@ cd ~/docker/pihole-unbound
 
 ## Step 2: Download the Repository
 
-You can download the latest version of this repository using **`wget`** or **`curl`**:
-
-**Option 1: Using `wget`**
-
-```bash
-wget https://github.com/kaczmar2/pihole-unbound/archive/refs/heads/main.tar.gz
-tar -xzf main.tar.gz --strip-components=1
-```
-
-**Option 2: Using `curl`**
+Download the latest version of the repository:
 
 ```bash
 curl -L -o main.tar.gz https://github.com/kaczmar2/pihole-unbound/archive/refs/heads/main.tar.gz
@@ -70,15 +65,9 @@ tar -xzf main.tar.gz --strip-components=1
 The `--strip-components=1` flag ensures the contents are extracted directly
 into `~/docker/pihole-unbound` instead of creating an extra subdirectory.
 
-**Note**: This setup now uses the official `alpinelinux/unbound` Docker image,
+**Note**: This setup uses the official `alpinelinux/unbound` Docker image,
 which provides better security, regular updates, and cross-platform
 compatibility (including Raspberry Pi).
-
-Optional: Remove the archive after extraction:
-
-```sh
-rm main.tar.gz
-```
 
 ## Step 3: Set the Pi-hole Admin Password
 
@@ -142,13 +131,13 @@ the TOML file to be updated.
 5. Copy the hash value and add it to your `.env` file (enclose in single quotes):
 
    ```bash
-   WEBSERVER_PWHASH='$BALLOON-SHA256$v=1$s=1024,t=32$pZCbBIUH/Ew2n144eLn3vw==$vgej+obQip4DvSmNlywD0LUHlsHcqgLdbQLvDscZs78='
+   WEB_PWHASH='$BALLOON-SHA256$v=1$s=1024,t=32$pZCbBIUH/Ew2n144eLn3vw==$vgej+obQip4DvSmNlywD0LUHlsHcqgLdbQLvDscZs78='
    ```
 
 6. Uncomment the `FTLCONF_webserver_api_pwhash` environment variable in `docker-compose.yml`:
 
    ```yaml
-   FTLCONF_webserver_api_pwhash: ${WEBSERVER_PWHASH}
+   FTLCONF_webserver_api_pwhash: ${WEB_PWHASH}
    ```
 
 7. Restart the containers:
@@ -159,7 +148,7 @@ the TOML file to be updated.
 
 </details>
 
-## Step 4: Verify Unbound is Working
+## Step 4: Verify Unbound Is Working
 
 To confirm Unbound is resolving queries correctly, run the following commands
 **in the pihole container**:
@@ -198,7 +187,7 @@ http://<your-server-ip>/admin/
 
 Login using the password you set.
 
-## Step 6: Secure with SSL (Optional)
+## Step 6: Secure Web Interface With SSL (Optional)
 
 For enhanced security, see my other guides on **configuring SSL encryption** for
 the Pi-hole web interface.
