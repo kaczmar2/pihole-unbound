@@ -38,10 +38,8 @@ Run the following commands:
 mkdir -p ~/docker/pihole-unbound
 sudo mkdir -p /srv/docker/pihole-unbound/pihole/etc-pihole
 sudo mkdir -p /srv/docker/pihole-unbound/pihole/etc-dnsmasq.d
-sudo mkdir -p /srv/docker/pihole-unbound/unbound/etc-unbound
 sudo chown -R $USER:$USER /srv/docker
 chmod -R 755 /srv/docker
-touch /srv/docker/pihole-unbound/unbound/etc-unbound/unbound.log
 cd ~/docker/pihole-unbound
 ```
 
@@ -51,7 +49,6 @@ cd ~/docker/pihole-unbound
 - `sudo mkdir -p /srv/docker/...`: Creates **bind mounts** for Pi-hole and Unbound.
 - `sudo chown -R $USER:$USER /srv/docker`: Ensures **your user owns the folders**.
 - `chmod -R 755 /srv/docker`: Sets **read/write permissions** for better access.
-- `touch unbound.log`: Prepares the **log file for Unbound**.
 
 ## Step 2: Download the Repository
 

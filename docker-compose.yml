@@ -42,6 +42,13 @@ services:
       #- SYS_TIME
       # Optional, if Pi-hole should get some more processing time
       - SYS_NICE
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "5"
+        compress: "true"
+        labels: "service=pihole"
     restart: unless-stopped
   unbound:
     container_name: unbound
@@ -50,9 +57,14 @@ services:
     network_mode: service:pihole
     volumes:
       # config files
-      - ./unbound-config/unbound.conf:/etc/unbound/unbound.conf
-      - ./unbound-config/unbound.conf.d:/etc/unbound/unbound.conf.d
-      # log file
-      - /srv/docker/pihole-unbound/unbound/etc-unbound/unbound.log:/etc/unbound/unbound.log
+      - ./unbound-config/unbound.conf:/etc/unbound/unbound.conf:ro
+      - ./unbound-config/unbound.conf.d:/etc/unbound/unbound.conf.d:ro
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "5"
+        compress: "true"
+        labels: "service=unbound"
     restart: unless-stopped
 
