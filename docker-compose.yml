@@ -17,8 +17,13 @@ services:
       # Set the appropriate timezone for your location from
       # https://en.wikipedia.org/wiki/List_of_tz_database_time_zones, e.g:
       TZ: ${TZ}
-      # Set a password to access the web interface. Not setting one will result in a random password being assigned
-      #FTLCONF_webserver_api_pwhash: ${WEBSERVER_PWHASH}
+      # Web interface password. Recommended: leave the line below commented out
+      # and set the password once with:
+      #   docker exec pihole pihole setpassword 'mypassword'
+      # (persists in the bind-mounted pihole.toml). Alternative: set
+      # WEBSERVER_PASSWORD in .env and uncomment the line below (see README).
+      # If neither is done, a random password is assigned (see `docker logs pihole`).
+      #FTLCONF_webserver_api_password: ${WEBSERVER_PASSWORD}
       # If using Docker's default `bridge` network setting the dns listening mode should be set to 'all'
       FTLCONF_dns_listeningMode: ${DNS_LISTENINGMODE}
       FTLCONF_dns_upstreams: '127.0.0.1#5335' # Unbound
