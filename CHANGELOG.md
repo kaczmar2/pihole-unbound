@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- README: recommended blocklist upgrade step (Hagezi Multi Pro via the web
+  interface); SSL guide is now Step 8.
+
 ## [3.0.0] - 2026-07-10
 
 ### Added

@@ -165,7 +165,27 @@ http://<your-server-ip>/admin/
 
 Log in using the password you set in Step 4.
 
-## Step 7: Secure Web Interface With SSL (Optional)
+## Step 7: Upgrade the Blocklist (Recommended)
+
+Pi-hole ships with the [StevenBlack hosts](https://github.com/StevenBlack/hosts)
+list as its default blocklist. It works, but the
+[Hagezi Multi Pro](https://github.com/hagezi/dns-blocklists) list blocks more
+ads, trackers, and scam domains while staying safe for everyday browsing —
+it's what I run on my own network.
+
+To switch, in the Pi-hole web interface:
+
+1. Go to **Lists** and add a new entry:
+   - **Address**: `https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/pro.txt`
+   - **Comment**: `Hagezi Multi Pro`
+2. On the same page, disable or delete the default StevenBlack entry.
+3. Go to **Tools > Update Gravity** and click **Update**.
+
+Hagezi also offers lighter and stricter variants (Light, Normal, Pro++,
+Ultimate) — see the [Hagezi repository](https://github.com/hagezi/dns-blocklists)
+if you want to tune it.
+
+## Step 8: Secure Web Interface With SSL (Optional)
 
 For enhanced security, see my guides on **configuring SSL encryption** for
 the Pi-hole web interface:
