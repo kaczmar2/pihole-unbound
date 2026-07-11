@@ -66,86 +66,67 @@ into `~/docker/pihole-unbound` instead of creating an extra subdirectory.
 which provides better security, regular updates, and cross-platform
 compatibility (including Raspberry Pi).
 
-## Step 3: Set the Pi-hole Admin Password
-
-### Automated Setup
-
-Use the automated setup script to configure your Pi-hole admin password:
+## Step 3: Start the Containers
 
 ```bash
-./set-password.sh
+docker compose up -d
 ```
 
-This script will:
+Docker pulls the `pihole/pihole` and `alpinelinux/unbound` images and starts
+both containers.
 
-- Prompt you securely for a password
-- Temporarily disable the password environment variable in docker-compose.yml
-- Set the password in the Pi-hole container (writes to pihole.toml)
-- Extract and save the password hash to your `.env` file
-- Re-enable the password environment variable in docker-compose.yml
-- Restart containers with the new configuration
-- Create backups of your config files
+## Step 4: Set the Pi-hole Admin Password
 
-Your Pi-hole admin interface will be ready with the password you set.
+### Recommended: `pihole setpassword`
 
-### Manual Setup
+Set the password once, directly in the running container:
 
-If you prefer the manual approach or need to troubleshoot:
+```bash
+docker exec pihole pihole setpassword 'mypassword'
+```
 
-<details>
-<summary>Click to expand manual setup instructions</summary>
+The password hash is stored in `/etc/pihole/pihole.toml`, which lives in the
+`/srv/docker/pihole-unbound/pihole/etc-pihole` bind mount, so it persists
+across container restarts and image upgrades. No password is stored in
+`.env`, and you can change it later from the web interface or by re-running
+the command.
 
-**Important**: For Pi-hole v6, environment variables override the TOML file.
-You must temporarily comment out the password environment variable to allow
-the TOML file to be updated.
+### Alternative: Environment Variable
 
-1. Comment out `FTLCONF_webserver_api_pwhash` in `docker-compose.yml`:
+If you'd rather keep the password in your config files, you can set it with
+an environment variable instead:
 
-   ```yaml
-   # FTLCONF_webserver_api_pwhash: ${WEBSERVER_PWHASH}
+1. Set the password in `.env`:
+
+   ```bash
+   WEBSERVER_PASSWORD='mypassword'
    ```
 
-2. Restart containers to apply the change:
+2. Uncomment this line in `docker-compose.yml`:
+
+   ```yaml
+   FTLCONF_webserver_api_password: ${WEBSERVER_PASSWORD}
+   ```
+
+3. Restart the containers:
 
    ```bash
    docker compose down && docker compose up -d
    ```
 
-3. Set your password in the Pi-hole container:
+**Notes:**
 
-   ```bash
-   docker exec -it pihole /bin/bash
-   pihole setpassword 'mypassword'
-   ```
+- If you uncomment the `FTLCONF_webserver_api_password` line,
+  `WEBSERVER_PASSWORD` must be set to a non-empty value: an empty value
+  turns off the web interface login entirely (it does not fall back to a
+  random password).
+- Settings that come from environment variables are locked in Pi-hole v6:
+  you can't change the password from the web interface or command line
+  while the variable is set.
+- The plaintext password is visible in `.env` and in `docker inspect pihole`.
+  Use the `pihole setpassword` method if you don't want that.
 
-4. Get the hashed password from `pihole.toml`:
-
-   ```bash
-   cat /etc/pihole/pihole.toml | grep -E "^[[:space:]]*pwhash[[:space:]]*="
-   exit
-   ```
-
-5. Copy the hash value and add it to your `.env` file (enclose in single quotes):
-
-   ```bash
-   WEBSERVER_PWHASH='$BALLOON-SHA256$v=1$s=1024,t=32$pZCbBIUH/Ew2n144eLn3vw==$vgej+obQip4DvSmNlywD0LUHlsHcqgLdbQLvDscZs78='
-   ```
-
-6. Uncomment the `FTLCONF_webserver_api_pwhash` environment variable in `docker-compose.yml`:
-
-   ```yaml
-   FTLCONF_webserver_api_pwhash: ${WEBSERVER_PWHASH}
-   ```
-
-7. Restart the containers:
-
-   ```bash
-   docker compose down && docker compose up -d
-   ```
-
-</details>
-
-## Step 4: Verify Unbound Is Working
+## Step 5: Verify Unbound Is Working
 
 To confirm Unbound is resolving queries correctly, run the following commands
 **in the pihole container**:
@@ -174,7 +155,7 @@ dig dnssec.works @127.0.0.1 -p 5335
 The first command should give a status report of SERVFAIL and no IP address. The
 second should give NOERROR plus an IP address.
 
-## Step 5: Access the Pi-hole Web Interface
+## Step 6: Access the Pi-hole Web Interface
 
 Once running, open your web browser and go to:
 
@@ -182,20 +163,23 @@ Once running, open your web browser and go to:
 http://<your-server-ip>/admin/
 ```
 
-Login using the password you set.
+Log in using the password you set in Step 4.
 
-## Step 6: Secure Web Interface With SSL (Optional)
+## Step 7: Secure Web Interface With SSL (Optional)
 
-For enhanced security, see my other guides on **configuring SSL encryption** for
-the Pi-hole web interface.
+For enhanced security, see my guides on **configuring SSL encryption** for
+the Pi-hole web interface:
 
-- [Pi-hole v6 + Docker: Automating Let's Encrypt SSL Renewal with Cloudflare DNS](https://gist.github.com/kaczmar2/027fd6f64f4e4e7ebbb0c75cb3409787#file-pihole-v6-docker-le-cf-md)
+- [Pi-hole v6 SSL Certificates](https://github.com/kaczmar2/pihole-ssl-guide) –
+  browser-trusted certificates with an internal CA (or self-signed)
+- [Pi-hole v6 + Docker: Let's Encrypt with Cloudflare DNS](https://gist.github.com/kaczmar2/027fd6f64f4e4e7ebbb0c75cb3409787) –
+  publicly trusted, auto-renewing certificates
 
 ## Common Issues & Troubleshooting
 
 ### Fix `so-rcvbuf` warning in Unbound (Optional)
 
-The configuration in `pi-hole.conf` sets the **socket receive buffer size** for
+The configuration in `10-pi-hole.conf` sets the **socket receive buffer size** for
 incoming DNS queries to a higher-than-default value in order to handle high
 query rates.
 
@@ -248,6 +232,11 @@ The `unbound.conf.d/` directory contains custom configuration settings for Unbou
 
 ### Configuration Files
 
+- **`unbound.conf`** – Only the settings that change Unbound's built-in
+  defaults: the DNSSEC trust anchor, cache sizes suited to home networks,
+  and a few security hardening options. Everything else uses Unbound's
+  defaults. To see the value Unbound is actually using for any setting, run
+  `docker exec unbound unbound-checkconf -o <option>`.
 - **`unbound.conf.d/`** _(Custom Unbound settings, automatically included via a wildcard in `unbound.conf`.)_
   - **`10-pi-hole.conf`** – Configures Unbound for use with Pi-hole following the [Pi-hole Unbound guide](https://docs.pi-hole.net/guides/dns/unbound/).
   - **`20-private-domains.conf`** – Adds exceptions for domains that resolve private IPs from public DNS servers.
