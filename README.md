@@ -167,10 +167,13 @@ Log in using the password you set in Step 4.
 
 ## Step 7: Secure Web Interface With SSL (Optional)
 
-For enhanced security, see my other guides on **configuring SSL encryption** for
-the Pi-hole web interface.
+For enhanced security, see my guides on **configuring SSL encryption** for
+the Pi-hole web interface:
 
-- [Pi-hole v6 + Docker: Automating Let's Encrypt SSL Renewal with Cloudflare DNS](https://gist.github.com/kaczmar2/027fd6f64f4e4e7ebbb0c75cb3409787#file-pihole-v6-docker-le-cf-md)
+- [Pi-hole v6 SSL Certificates](https://github.com/kaczmar2/pihole-ssl-guide) –
+  browser-trusted certificates with an internal CA (or self-signed)
+- [Pi-hole v6 + Docker: Let's Encrypt with Cloudflare DNS](https://gist.github.com/kaczmar2/027fd6f64f4e4e7ebbb0c75cb3409787) –
+  publicly trusted, auto-renewing certificates
 
 ## Common Issues & Troubleshooting
 
