@@ -93,8 +93,8 @@ the command.
 
 ### Alternative: Environment Variable
 
-If you prefer to manage the password declaratively (e.g., for automated
-deployments), set it via an environment variable instead:
+If you'd rather keep the password in your config files, you can set it with
+an environment variable instead:
 
 1. Set the password in `.env`:
 
@@ -118,10 +118,10 @@ deployments), set it via an environment variable instead:
 
 - If you uncomment the `FTLCONF_webserver_api_password` line,
   `WEBSERVER_PASSWORD` must be set to a non-empty value: an empty value
-  disables web interface authentication entirely (it does not fall back to
-  a random password).
-- Pi-hole v6 treats settings supplied via environment variables as
-  read-only: the password cannot be changed from the web interface or CLI
+  turns off the web interface login entirely (it does not fall back to a
+  random password).
+- Settings that come from environment variables are locked in Pi-hole v6:
+  you can't change the password from the web interface or command line
   while the variable is set.
 - The plaintext password is visible in `.env` and in `docker inspect pihole`.
   Use the `pihole setpassword` method if you don't want that.
@@ -229,10 +229,10 @@ The `unbound.conf.d/` directory contains custom configuration settings for Unbou
 
 ### Configuration Files
 
-- **`unbound.conf`** – Only the settings that differ from Unbound's
-  compiled-in defaults: the DNSSEC trust anchor, modest cache tuning for home
-  networks, and a small set of hardening options. Everything else uses
-  Unbound's defaults. Check any effective value with
+- **`unbound.conf`** – Only the settings that change Unbound's built-in
+  defaults: the DNSSEC trust anchor, cache sizes suited to home networks,
+  and a few security hardening options. Everything else uses Unbound's
+  defaults. To see the value Unbound is actually using for any setting, run
   `docker exec unbound unbound-checkconf -o <option>`.
 - **`unbound.conf.d/`** _(Custom Unbound settings, automatically included via a wildcard in `unbound.conf`.)_
   - **`10-pi-hole.conf`** – Configures Unbound for use with Pi-hole following the [Pi-hole Unbound guide](https://docs.pi-hole.net/guides/dns/unbound/).
