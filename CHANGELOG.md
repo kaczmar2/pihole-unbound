@@ -31,6 +31,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     `outgoing-range`) and settings that were silently overridden by
     `unbound.conf.d/10-pi-hole.conf` (`num-threads`, `use-caps-for-id`,
     `verbosity`, `logfile`).
+  - A few options reverted to compiled defaults: `neg-cache-size` (1 MB),
+    `do-not-query-localhost` (yes), and removal of unused `identity` /
+    `http-user-agent` strings and `tls-cert-bundle`.
 
 ### Removed
 
@@ -46,6 +49,10 @@ new scheme, remove the `FTLCONF_webserver_api_pwhash` line from
 `docker-compose.yml` and `WEBSERVER_PWHASH` from `.env`, restart
 (`docker compose down && docker compose up -d`), then run
 `docker exec pihole pihole setpassword 'mypassword'`.
+
+Note: re-extracting the release tarball overwrites `.env` and
+`docker-compose.yml` with the new templates — re-apply your local values
+(e.g. `TZ`) afterward.
 
 ## [2.1.0] - 2025-08-26
 

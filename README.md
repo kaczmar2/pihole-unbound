@@ -116,6 +116,10 @@ deployments), set it via an environment variable instead:
 
 **Notes:**
 
+- If you uncomment the `FTLCONF_webserver_api_password` line,
+  `WEBSERVER_PASSWORD` must be set to a non-empty value: an empty value
+  disables web interface authentication entirely (it does not fall back to
+  a random password).
 - Pi-hole v6 treats settings supplied via environment variables as
   read-only: the password cannot be changed from the web interface or CLI
   while the variable is set.
@@ -172,7 +176,7 @@ the Pi-hole web interface.
 
 ### Fix `so-rcvbuf` warning in Unbound (Optional)
 
-The configuration in `pi-hole.conf` sets the **socket receive buffer size** for
+The configuration in `10-pi-hole.conf` sets the **socket receive buffer size** for
 incoming DNS queries to a higher-than-default value in order to handle high
 query rates.
 

@@ -23,6 +23,8 @@ services:
       # (persists in the bind-mounted pihole.toml). Alternative: set
       # WEBSERVER_PASSWORD in .env and uncomment the line below (see README).
       # If neither is done, a random password is assigned (see `docker logs pihole`).
+      # WARNING: if you uncomment the line below, WEBSERVER_PASSWORD must be
+      # non-empty. An empty value disables web interface authentication.
       #FTLCONF_webserver_api_password: ${WEBSERVER_PASSWORD}
       # If using Docker's default `bridge` network setting the dns listening mode should be set to 'all'
       FTLCONF_dns_listeningMode: ${DNS_LISTENINGMODE}
