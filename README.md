@@ -167,11 +167,10 @@ Log in using the password you set in Step 4.
 
 ## Step 7: Upgrade the Blocklist (Recommended)
 
-Pi-hole ships with the [StevenBlack hosts](https://github.com/StevenBlack/hosts)
-list as its default blocklist. It works, but the
-[Hagezi Multi Pro](https://github.com/hagezi/dns-blocklists) list blocks more
-ads, trackers, and scam domains while staying safe for everyday browsing —
-it's what I run on my own network.
+Pi-hole uses the [StevenBlack hosts](https://github.com/StevenBlack/hosts)
+list by default. For better protection, the
+[Hagezi Multi Pro](https://github.com/hagezi/dns-blocklists) list blocks 
+significantly more ads and trackers without breaking common websites.
 
 To switch, in the Pi-hole web interface:
 
