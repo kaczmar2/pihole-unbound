@@ -324,17 +324,30 @@ docker logs unbound
 
 ### Port 53 Is Already in Use
 
-On Ubuntu and recent Debian versions, `systemd-resolved` listens on port 53.
-Docker cannot bind the port, and `docker compose up -d` fails with an error
-about the address already in use.
+Pi-hole needs port 53 for DNS. If another program on the host already uses
+port 53, `docker compose up -d` stops with this error:
 
-1. Find the process that holds the port:
+```text
+Error response from daemon: failed to set up container networking: driver
+failed programming external connectivity on endpoint pihole (0a1b2c3d...):
+failed to bind host port 0.0.0.0:53/tcp: address already in use
+```
+
+Older versions of Docker word this message differently. The message always
+ends with `address already in use`.
+
+On Ubuntu and recent Debian versions, `systemd-resolved` causes the conflict.
+It runs a local DNS stub listener on port 53.
+
+1. Find the program that holds the port:
 
    ```bash
    sudo ss -tulpn | grep ':53'
    ```
 
-2. If the process is `systemd-resolved`, turn off its stub listener:
+   The output names the program, for example `systemd-resolved`.
+
+2. If the program is `systemd-resolved`, turn off its stub listener:
 
    ```bash
    sudo sed -i 's/^#\?DNSStubListener=.*/DNSStubListener=no/' /etc/systemd/resolved.conf
