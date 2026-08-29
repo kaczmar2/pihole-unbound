@@ -10,7 +10,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - README: recommended blocklist upgrade step (Hagezi Multi Pro via the web
-  interface); SSL guide is now Step 8.
+  interface).
+- README: new steps for setting the timezone in `.env` and for pointing
+  devices at Pi-hole for DNS.
+- README: a table of contents, a "Maintenance" section (update the
+  containers, check the logs), and a troubleshooting entry for the
+  `systemd-resolved` conflict on port 53.
+- README: static IP address added to the prerequisites.
+
+### Changed
+
+- README rewritten for plain English (ASD-STE100 style): shorter sentences,
+  active voice, one term per concept, no unapproved modals.
+- README steps renumbered. The SSL guide is now Step 10, so old section
+  anchors changed.
+- README: Unbound configuration reference moved above the troubleshooting
+  section and corrected to use `unbound-config/` paths.
+
+### Fixed
+
+- README: `chmod 755` and the `/srv/docker` bind mount description were
+  inaccurate. Unbound has no bind mount under `/srv/docker`.
+- README: removed a duplicated paragraph about the `alpinelinux/unbound`
+  image.
+- README: Step 2 now removes the downloaded tarball.
 
 ## [3.0.0] - 2026-07-10
 
